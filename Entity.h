@@ -26,7 +26,6 @@ public:
 	void update();
 	void setPos(float x, float y);
 	void setDir(direction dir);
-	void setCurrentFrame(int x, int y, SDL_Texture* p_tex);
 	SDL_Rect getCurrentFrame();
 private:
 	position pos;
