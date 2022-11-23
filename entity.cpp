@@ -1,38 +1,48 @@
 #include "Entity.h"
-#include "Position.h"
 #include <SDL.h>
+#include <SDL_image.h>
 
-enum direction { DEFAULT, UP, DOWN, LEFT, RIGHT };
-
-class Entity
+Entity::Entity(position p_pos, SDL_Texture* p_tex)
+	:pos(p_pos), tex(p_tex)
 {
-public:
-	Entity(position p_pos, SDL_Texture* p_tex);
-	position& getPos()
-	{
-		return pos;
-	}
-	direction getDir()
-	{
-		return dir;
-	}
-	float getAngle()
-	{
-		return angle;
-	}
-	Vector2f getScale()
-	{
-		return scale;
-	}
-	void setPos(float x, float y);
-	void setDir(direction dir);
-	SDL_Texture* getTex();
-	void update();
-	void setCurrentFrame(int x, int y, int w, int h, SDL_Texture* p_tex);
-	SDL_Rect getCurrentFrame();
-private:
-	position pos;
-	direction dir = DEFAULT;
-	SDL_Rect currentFrame;
-	SDL_Texture* tex;
-};
+	//SDL_QueryTexture(p_tex, NULL, NULL, &currentFrame.w, &currentFrame.h);
+}
+
+SDL_Texture* Entity::getTex()
+{
+	return tex;
+}
+
+void Entity::update()
+{
+	
+}
+
+void Entity::setPos(float x, float y)
+{
+	pos.x = x;
+	pos.y = y;
+}
+
+void Entity::setDir(direction p_dir)
+{
+	dir = p_dir;
+}
+
+void Entity::setScale(float w, float h)
+{
+	scale.x = w;
+	scale.y = h;
+}
+
+void Entity::setCurrentFrame(int x, int y, SDL_Texture* p_tex)
+{
+	currentFrame.x = x;
+	currentFrame.y = y;
+	SDL_QueryTexture(p_tex, NULL, NULL, &currentFrame.w, &currentFrame.h);
+}
+
+SDL_Rect Entity::getCurrentFrame()
+{
+	return currentFrame;
+}
