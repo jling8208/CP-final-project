@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Entity.h"
-#include "Position.h"
+#include "Math.h"
 #include <SDL.h>
 
 enum direction { DEFAULT, UP, DOWN, LEFT, RIGHT };
@@ -9,8 +9,8 @@ enum direction { DEFAULT, UP, DOWN, LEFT, RIGHT };
 class Entity
 {
 public:
-	Entity(position p_pos, SDL_Texture* p_tex);
-	position& getPos()
+	Entity(Vector2f p_pos, SDL_Texture* p_tex);
+	Vector2f& getPos()
 	{
 		return pos;
 	}
@@ -18,7 +18,7 @@ public:
 	{
 		return dir;
 	}
-	position getScale()
+	Vector2f getScale()
 	{
 		return scale;
 	}
@@ -28,7 +28,7 @@ public:
 	void setDir(direction dir);
 	SDL_Rect getCurrentFrame();
 private:
-	position pos;
+	Vector2f pos;
 	direction dir = DEFAULT;
 	SDL_Rect currentFrame;
 	SDL_Texture* tex;
