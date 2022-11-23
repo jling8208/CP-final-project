@@ -18,19 +18,15 @@ public:
 	{
 		return dir;
 	}
-	float getAngle()
-	{
-		return angle;
-	}
-	Vector2f getScale()
+	position getScale()
 	{
 		return scale;
 	}
-	void setPos(float x, float y);
-	void setDir(direction dir);
 	SDL_Texture* getTex();
 	void update();
-	void setCurrentFrame(int x, int y, int w, int h, SDL_Texture* p_tex);
+	void setPos(float x, float y);
+	void setDir(direction dir);
+	void setCurrentFrame(int x, int y, SDL_Texture* p_tex);
 	SDL_Rect getCurrentFrame();
 private:
 	position pos;
