@@ -2,7 +2,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-Entity::Entity(position p_pos, SDL_Texture* p_tex)
+Entity::Entity(Vector2f p_pos, SDL_Texture* p_tex)
 	:pos(p_pos), tex(p_tex)
 {
 	currentFrame.x = 0;
