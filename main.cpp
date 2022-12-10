@@ -33,7 +33,6 @@ RenderWindow window("Twini-Golf", 640, 480);
 
 SDL_Texture* cursorTexture = window.loadTexture("res/gfx/cursor.png"); 
 SDL_Texture* bulletTexture = window.loadTexture("res/gfx/bullet.png");
-SDL_Texture* pointTexture = window.loadTexture("res/gfx/point.png");
 SDL_Texture* obstacleDarkTexture32 = window.loadTexture("res/gfx/tile32_dark.png");
 SDL_Texture* obstacleDarkTexture64 = window.loadTexture("res/gfx/tile64_dark.png");
 SDL_Texture* obstacleLightTexture32 = window.loadTexture("res/gfx/tile32_light.png");
@@ -41,9 +40,6 @@ SDL_Texture* obstacleLightTexture64 = window.loadTexture("res/gfx/tile64_light.p
 SDL_Texture* bgTexture = window.loadTexture("res/gfx/bg.png");
 SDL_Texture* uiBgTexture = window.loadTexture("res/gfx/UI_bg.png");
 SDL_Texture* levelTextBgTexture = window.loadTexture("res/gfx/levelText_bg.png");
-SDL_Texture* powerMeterTexture_FG = window.loadTexture("res/gfx/powermeter_fg.png");
-SDL_Texture* powerMeterTexture_BG = window.loadTexture("res/gfx/powermeter_bg.png");
-SDL_Texture* powerMeterTexture_overlay = window.loadTexture("res/gfx/powermeter_overlay.png");
 SDL_Texture* healthMeterTexture_FG = window.loadTexture("res/gfx/healthmeter_fg.png");
 SDL_Texture* healthMeterTexture_BG = window.loadTexture("res/gfx/healthmeter_bg.png");
 SDL_Texture* healthMeterTexture_overlay = window.loadTexture("res/gfx/healthmeter_overlay.png");
@@ -73,7 +69,7 @@ std::vector<Obstacle> loadObstacles(int level)
 	std::vector<Obstacle> temp = {};
 	switch (level)
 	{
-	case 0:
+	case 1:
 		temp.push_back(Obstacle(Vector2f(64 * 3, 64 * 3), obstacleDarkTexture64));
 		temp.push_back(Obstacle(Vector2f(64 * 4, 64 * 3), obstacleDarkTexture64));
 
@@ -86,15 +82,15 @@ std::vector<Obstacle> loadObstacles(int level)
 		temp.push_back(Obstacle(Vector2f(64 * 0 + 64 * 5, 64 * 3), obstacleLightTexture64));
 		temp.push_back(Obstacle(Vector2f(64 * 1 + 64 * 5, 64 * 3), obstacleLightTexture64));
 		break;
-	case 1:
+	case 2:
 		temp.push_back(Obstacle(Vector2f(64 * 2, 64 * 3), obstacleDarkTexture64));
 
 		temp.push_back(Obstacle(Vector2f(64 * 4 + 64 * 5, 64 * 3), obstacleLightTexture64));
 		break;
-	case 2:
+	case 3:
 		temp.push_back(Obstacle(Vector2f(32 * 1 + 32 * 10 + 16, 32 * 5), obstacleLightTexture32));
 		break;
-	case 3:
+	case 4:
 		temp.push_back(Obstacle(Vector2f(32 * 4, 32 * 7), obstacleDarkTexture64));
 		temp.push_back(Obstacle(Vector2f(32 * 3, 32 * 5), obstacleDarkTexture32));
 		temp.push_back(Obstacle(Vector2f(32 * 6, 32 * 3), obstacleDarkTexture32));
@@ -103,7 +99,7 @@ std::vector<Obstacle> loadObstacles(int level)
 		temp.push_back(Obstacle(Vector2f(32 * 3 + 32 * 10, 32 * 6), obstacleLightTexture32));
 		temp.push_back(Obstacle(Vector2f(32 * 6 + 32 * 10, 32 * 9), obstacleLightTexture32));
 		break;
-	case 4:
+	case 5:
 		temp.push_back(Obstacle(Vector2f(32 * 3, 32 * 1), obstacleDarkTexture32));
 		temp.push_back(Obstacle(Vector2f(32 * 1, 32 * 3), obstacleDarkTexture32));
 		temp.push_back(Obstacle(Vector2f(32 * 5, 32 * 3), obstacleDarkTexture32));
@@ -128,7 +124,7 @@ std::vector<Obstacle> loadObstacles(int level)
 	return temp;
 }
 
-int level = 0;
+int level = 1;
 std::vector<Obstacle> obstacles = loadObstacles(level);
 
 bool gameRunning = true;
@@ -150,7 +146,7 @@ double deltaTime = 0;
 
 void loadLevel(int level)
 {
-	if (level > 4)
+	if (level > 5)
 	{
 		state = 2;
 		return;
@@ -160,19 +156,19 @@ void loadLevel(int level)
 
 	switch (level)
 	{
-	case 0:
-		player.setPos(24 + 32 * 4, 24 + 32 * 11);
-		break;
 	case 1:
 		player.setPos(24 + 32 * 4, 24 + 32 * 11);
 		break;
 	case 2:
-		player.setPos(24 + 32 * 7, 24 + 32 * 10);
-		break;
-	case 3:
 		player.setPos(24 + 32 * 4, 24 + 32 * 11);
 		break;
+	case 3:
+		player.setPos(24 + 32 * 7, 24 + 32 * 10);
+		break;
 	case 4:
+		player.setPos(24 + 32 * 4, 24 + 32 * 11);
+		break;
+	case 5:
 		player.setPos(24 + 32 * 2, 24 + 32 * 12);
 		break;
 	}
@@ -246,10 +242,6 @@ void update()
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym)
 			{
-			case SDLK_0:
-				level = 0;
-				loadLevel(level);
-				break;
 			case SDLK_1:
 				level = 1;
 				loadLevel(level);
@@ -266,8 +258,12 @@ void update()
 				level = 4;
 				loadLevel(level);
 				break;
-			case SDLK_ESCAPE:
+			case SDLK_5:
 				level = 5;
+				loadLevel(level);
+				break;
+			case SDLK_ESCAPE:
+				level = 6;
 				loadLevel(level);
 				break;
 			case SDLK_SPACE:
