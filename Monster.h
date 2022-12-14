@@ -26,7 +26,6 @@ public:
         return healthBar;
     }
     void addHealth(float healthVal);
-    void setInitialMousePos(float x, float y);
     void setVelocity(float x, float y);
     void setV_factor(float f);
     double getAim();
