@@ -31,11 +31,6 @@ void Monster::setV_factor(float f)
     v_factor = f;
 }
 
-void Monster::setInitialMousePos(float x, float y)
-{
-    initialMousePos.x = x;
-    initialMousePos.y = y;
-}
 
 void Monster::addHealth(float healthVal)
 {
