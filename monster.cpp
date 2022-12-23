@@ -55,82 +55,57 @@ double Monster::getAim()
     return aim;
 }
 
-void Monster::update(double deltaTime, bool keyDown, std::vector<Tile> tiles)
-{
-    healthBar.at(0).setPos(getPos().x + 32 + 8, getPos().y + 32);
-    healthBar.at(1).setPos(getPos().x + 32 + 8 + 4, getPos().y + 32 + 4);
-    healthBar.at(1).setScale(health / 100, 1);
-
-    if (keyDown)
-    {
-        switch (Entity::getDir())
-        {
-        case (UP):
-            if (getPos().y > 0)
-            {
-                setVelocity(0, -v_init);
-            }
-            else
-            {
-                setVelocity(0, 0);
-            }
-            break;
-
-        case (DOWN):
-            if (getPos().y + getCurrentFrame().h * getScale().y < 480)
-            {
-                setVelocity(0, v_init);
-            }
-            else
-            {
-                setVelocity(0, 0);
-            }
-            break;
-
-        case (LEFT):
-            if (getPos().x > 0)
-            {
-                setVelocity(-v_init, 0);
-            }
-            else
-            {
-                setVelocity(0, 0);
-            }
-            break;
-
-        case (RIGHT):
-            if (getPos().x + getCurrentFrame().w * getScale().x < 640)
-            {
-                setVelocity(v_init, 0);
-            }
-            else
-            {
-                setVelocity(0, 0);
-            }
-            break;
+//這邊的數值都要剪掉物件的高
+void Monster::update(double deltaTime, bool keyDown, std::vector<Tile> tiles,Player& player)
+{   if (getPos().y>432 && getPos().y<528){
+        if(player.getPos().y>=getPos().y){
+            setVelocity(0.0,v_factor);
+        }
+        else {
+            setVelocity(0.0,-1*v_factor);
         }
     }
-    else
-    {
-        setVelocity(0, 0);
-    }
-
-    for (Obstacle& o : obstacles)
-    {
-        float newX = getPos().x + getVelocity().x * deltaTime;
-        float newY = getPos().y;
-        if (newX + getCurrentFrame().w * getScale().x > o.getPos().x && newX < o.getPos().x + o.getCurrentFrame().w && newY + getCurrentFrame().h * getScale().y > o.getPos().y && newY < o.getPos().y + o.getCurrentFrame().h - 3)
-        {
-            setVelocity(0, getVelocity().y);
-        }
-
-        newX = getPos().x;
-        newY = getPos().y + getVelocity().y * deltaTime;
-        if (newX + getCurrentFrame().w * getScale().x > o.getPos().x && newX < o.getPos().x + o.getCurrentFrame().w && newY + getCurrentFrame().h * getScale().y > o.getPos().y && newY < o.getPos().y + o.getCurrentFrame().h - 3)
-        {
-            setVelocity(getVelocity().x, 0);
+    else if (getPos().y<=432){
+            if (player.getPos().y<432){
+            setVelocity(v_factor*((player.getPos().x-getPos().x)/std::sqrt(std::pow((player.getPos().x-getPos().x),2)+(player.getPos().y-getPos().y),2)),v_factor*((player.getPos().y-getPos().y)/std::sqrt(std::pow((player.getPos().x-getPos().x),2)+(player.getPos().y-getPos().y),2)));
+                }
+            else {
+                    //bridge1
+                if (player.getPos().x<=360){
+                    setVelocity(v_factor*(193-getPos().x)/std::sqrt(std::pow((193-getPos().x),2)+(432-getPos().y),2)),v_factor*((432-getPos().y)/std::sqrt(std::pow((193-getPos().x),2)+(432-getPos().y),2)));
+                }
+                    //bridge2
+                else if (player.getPos().x>360 && player.getPos().x<600){
+                    setVelocity(v_factor*(433-getPos().x)/std::sqrt(std::pow((433-getPos().x),2)+(432-getPos().y),2)),v_factor*((432-getPos().y)/std::sqrt(std::pow((433-getPos().x),2)+(432-getPos().y),2)));
+                }
+                    //bridge3
+                else {
+                    setVelocity(v_factor*(673-getPos().x)/std::sqrt(std::pow((673-getPos().x),2)+(432-getPos().y),2)),v_factor*((432-getPos().y)/std::sqrt(std::pow((673-getPos().x),2)+(432-getPos().y),2)));
+                }
         }
     }
+    else if (getPos().y>=528){
+        if (player.getPos().y>528){
+           setVelocity(v_factor*((player.getPos().x-getPos().x)/std::sqrt(std::pow((player.getPos().x-getPos().x),2)+(player.getPos().y-getPos().y),2)),v_factor*((player.getPos().y-getPos().y)/std::sqrt(std::pow((player.getPos().x-getPos().x),2)+(player.getPos().y-getPos().y),2)));
+            }
+
+        else {
+                    //bridge1
+            if (player.getPos().x<=360){
+                    setVelocity(v_factor*(193-getPos().x)/std::sqrt(std::pow((193-getPos().x),2)+(528-getPos().y),2)),v_factor*((528-getPos().y)/std::sqrt(std::pow((193-getPos().x),2)+(528-getPos().y),2)));
+                }
+                    //bridge2
+            else if (player.getPos().x>360 && player.getPos().x<600){
+                    setVelocity(v_factor*(433-getPos().x)/std::sqrt(std::pow((433-getPos().x),2)+(528-getPos().y),2)),v_factor*((528-getPos().y)/std::sqrt(std::pow((433-getPos().x),2)+(528-getPos().y),2)));
+                }
+                    //bridge3
+            else {
+                    setVelocity(v_factor*(673-getPos().x)/std::sqrt(std::pow((673-getPos().x),2)+(528-getPos().y),2)),v_factor*((528-getPos().y)/std::sqrt(std::pow((673-getPos().x),2)+(528-getPos().y),2)));
+                }
+        }
+    }
+    }
+
     setPos(getPos().x + getVelocity().x * deltaTime, getPos().y + getVelocity().y * deltaTime);
 }
 
