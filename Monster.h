@@ -29,7 +29,7 @@ public:
     void setVelocity(float x, float y);
     void setV_factor(float f);
     double getAim();
-    void update(double deltaTime, bool keyDown, std::vector<Obstacle> obstacles);
+    void update(double deltaTime, bool keyDown, std::vector<Obstacle> obstacles,Player& player);
 private:
     Vector2f velocity = Vector2f(0, 0);
     double aim;
