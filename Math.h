@@ -4,12 +4,35 @@
 
 struct Vector2f
 {
-	Vector2f(): x(0.0f), y(0.0f) {}
-	Vector2f(float p_x, float p_y): x(p_x), y(p_y) {}
+	Vector2f()
+		:x(0.0f), y(0.0f)
+	{}
 
-	void print()
+	Vector2f(float p_x, float p_y)
+		:x(p_x), y(p_y)
+	{}
+
+	Vector2f operator+(const Vector2f& other) const
 	{
-		std::cout << "Position at (" << x << ", " << y << ")" << std::endl;
+		Vector2f newV = Vector2f(x + other.x, y + other.y);
+		return newV;
+	}
+
+	Vector2f operator-(const Vector2f& other) const
+	{
+		Vector2f newV = Vector2f(x - other.x, y - other.y);
+		return newV;
+	}
+
+	Vector2f operator*(float k) const
+	{
+		Vector2f newV = Vector2f(x * k, y * k);
+		return newV;
+	}
+
+	void print() // for debug
+	{
+		std::cout << x << ", " << y << std::endl;
 	}
 
 	float x, y;

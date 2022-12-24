@@ -29,7 +29,7 @@ bool init()
 
 bool SDLinit = init();
 
-RenderWindow window("Twini-Golf", 640, 480);
+RenderWindow window("myGame", 960, 760);
 
 SDL_Texture* cursorTexture = window.loadTexture("res/gfx/cursor.png"); 
 SDL_Texture* bulletTexture = window.loadTexture("res/gfx/bullet.png");
@@ -48,10 +48,13 @@ SDL_Texture* endscreenOverlayTexture = window.loadTexture("res/gfx/end.png");
 SDL_Texture* splashBgTexture = window.loadTexture("res/gfx/splashbg.png");
 SDL_Texture* playerTextureL = window.loadTexture("res/gfx/player_l.gif");
 SDL_Texture* playerTextureR = window.loadTexture("res/gfx/player_r.gif");
+SDL_Texture* riverTexture = window.loadTexture("res/gfx/river.png");
+SDL_Texture* bridgeTexture = window.loadTexture("res/gfx/bridge.png");
 
-Mix_Chunk* chargeSfx = Mix_LoadWAV("res/sfx/charge.mp3");
-Mix_Chunk* swingSfx = Mix_LoadWAV("res/sfx/swing.mp3");
-Mix_Chunk* holeSfx = Mix_LoadWAV("res/sfx/hole.mp3");
+Mix_Chunk* chargeSfx = Mix_LoadWAV("res/sfx/res_sfx_charge.mp3");
+Mix_Chunk* swingSfx = Mix_LoadWAV("res/sfx/res_sfx_swing.mp3");
+Mix_Chunk* holeSfx = Mix_LoadWAV("res/sfx/res_sfx_hole.mp3");
+Mix_Chunk* shootSfx = Mix_LoadWAV("res/sfx/res_sfx_swing.mp3");
 
 SDL_Color white = { 255, 255, 255 };
 SDL_Color black = { 0, 0, 0 };
@@ -62,7 +65,46 @@ TTF_Font* font24 = TTF_OpenFont("res/font/font.ttf", 24);
 
 Player player(Vector2f(0, 0), playerTextureL, playerTextureR, healthMeterTexture_FG, healthMeterTexture_BG, healthMeterTexture_overlay);
 std::vector<Bullet> bullets = { };
+std::vector<Entity> rivers = { };
+std::vector<Entity> bridges = { };
 Mouse mouse = Mouse(Vector2f(0, 0), cursorTexture);
+//Entity river = Entity(Vector2f(0, 48 * 6), riverTexture);
+
+std::vector<Entity> loadRivers(int level)
+{
+	std::vector<Entity> temp = {};
+	switch (level)
+	{
+	case 1:
+		temp.push_back(Entity(Vector2f(0, 48 * 6), riverTexture));
+		break;
+	case 2:
+	case 3:
+	case 4:
+	case 5:
+		break;
+	}
+	return temp;
+}
+
+std::vector<Entity> loadBridges(int level)
+{
+	std::vector<Entity> temp = {};
+	switch (level)
+	{
+	case 1:
+		temp.push_back(Entity(Vector2f(48 * 4, 48 * 6), bridgeTexture));
+		temp.push_back(Entity(Vector2f(48 * 9, 48 * 6), bridgeTexture));
+		temp.push_back(Entity(Vector2f(48 * 14, 48 * 6), bridgeTexture));
+		break;
+	case 2:
+	case 3:
+	case 4:
+	case 5:
+		break;
+	}
+	return temp;
+}
 
 std::vector<Obstacle> loadObstacles(int level)
 {
@@ -70,55 +112,45 @@ std::vector<Obstacle> loadObstacles(int level)
 	switch (level)
 	{
 	case 1:
-		temp.push_back(Obstacle(Vector2f(64 * 3, 64 * 3), obstacleDarkTexture64));
-		temp.push_back(Obstacle(Vector2f(64 * 4, 64 * 3), obstacleDarkTexture64));
-
-		temp.push_back(Obstacle(Vector2f(64 * 0, 64 * 3), obstacleDarkTexture64));
-		temp.push_back(Obstacle(Vector2f(64 * 1, 64 * 3), obstacleDarkTexture64));
-
-		temp.push_back(Obstacle(Vector2f(64 * 3 + 64 * 5, 64 * 3), obstacleLightTexture64));
-		temp.push_back(Obstacle(Vector2f(64 * 4 + 64 * 5, 64 * 3), obstacleLightTexture64));
-
-		temp.push_back(Obstacle(Vector2f(64 * 0 + 64 * 5, 64 * 3), obstacleLightTexture64));
-		temp.push_back(Obstacle(Vector2f(64 * 1 + 64 * 5, 64 * 3), obstacleLightTexture64));
+		//temp.push_back(Obstacle(Vector2f(0, 48 * 6), riverTexture));
 		break;
 	case 2:
-		temp.push_back(Obstacle(Vector2f(64 * 2, 64 * 3), obstacleDarkTexture64));
+		temp.push_back(Obstacle(Vector2f(96 * 2, 96 * 3), obstacleDarkTexture64));
 
-		temp.push_back(Obstacle(Vector2f(64 * 4 + 64 * 5, 64 * 3), obstacleLightTexture64));
+		temp.push_back(Obstacle(Vector2f(96 * 4 + 96 * 5, 96 * 3), obstacleLightTexture64));
 		break;
 	case 3:
-		temp.push_back(Obstacle(Vector2f(32 * 1 + 32 * 10 + 16, 32 * 5), obstacleLightTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 1 + 48 * 10 + 16, 48 * 5), obstacleLightTexture32));
 		break;
 	case 4:
-		temp.push_back(Obstacle(Vector2f(32 * 4, 32 * 7), obstacleDarkTexture64));
-		temp.push_back(Obstacle(Vector2f(32 * 3, 32 * 5), obstacleDarkTexture32));
-		temp.push_back(Obstacle(Vector2f(32 * 6, 32 * 3), obstacleDarkTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 4, 48 * 7), obstacleDarkTexture64));
+		temp.push_back(Obstacle(Vector2f(48 * 3, 48 * 5), obstacleDarkTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 6, 48 * 3), obstacleDarkTexture32));
 
-		temp.push_back(Obstacle(Vector2f(32 * 4 + 64 * 5, 32 * 2), obstacleLightTexture64));
-		temp.push_back(Obstacle(Vector2f(32 * 3 + 32 * 10, 32 * 6), obstacleLightTexture32));
-		temp.push_back(Obstacle(Vector2f(32 * 6 + 32 * 10, 32 * 9), obstacleLightTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 4 + 96 * 5, 48 * 2), obstacleLightTexture64));
+		temp.push_back(Obstacle(Vector2f(48 * 3 + 48 * 10, 48 * 6), obstacleLightTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 6 + 48 * 10, 48 * 9), obstacleLightTexture32));
 		break;
 	case 5:
-		temp.push_back(Obstacle(Vector2f(32 * 3, 32 * 1), obstacleDarkTexture32));
-		temp.push_back(Obstacle(Vector2f(32 * 1, 32 * 3), obstacleDarkTexture32));
-		temp.push_back(Obstacle(Vector2f(32 * 5, 32 * 3), obstacleDarkTexture32));
-		temp.push_back(Obstacle(Vector2f(32 * 3, 32 * 5), obstacleDarkTexture32));
-		temp.push_back(Obstacle(Vector2f(32 * 7, 32 * 5), obstacleDarkTexture32));
-		temp.push_back(Obstacle(Vector2f(32 * 7, 32 * 10), obstacleDarkTexture32));
-		temp.push_back(Obstacle(Vector2f(32 * 3, 32 * 10), obstacleDarkTexture32));
-		temp.push_back(Obstacle(Vector2f(32 * 5, 32 * 12), obstacleDarkTexture32));
-		temp.push_back(Obstacle(Vector2f(32 * 7, 32 * 10), obstacleDarkTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 3, 48 * 1), obstacleDarkTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 1, 48 * 3), obstacleDarkTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 5, 48 * 3), obstacleDarkTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 3, 48 * 5), obstacleDarkTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 7, 48 * 5), obstacleDarkTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 7, 48 * 10), obstacleDarkTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 3, 48 * 10), obstacleDarkTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 5, 48 * 12), obstacleDarkTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 7, 48 * 10), obstacleDarkTexture32));
 
 		temp.push_back(Obstacle(Vector2f(32*4, 32*7), obstacleDarkTexture64));
-		temp.push_back(Obstacle(Vector2f(32 * 8, 32 * 7), obstacleDarkTexture64));
+		temp.push_back(Obstacle(Vector2f(48 * 8, 48 * 7), obstacleDarkTexture64));
 
-		temp.push_back(Obstacle(Vector2f(32 * 2 + 32 * 10, 32 * 2), obstacleLightTexture32));
-		temp.push_back(Obstacle(Vector2f(32 * 5 + 32 * 10, 32 * 11), obstacleLightTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 2 + 48 * 10, 48 * 2), obstacleLightTexture32));
+		temp.push_back(Obstacle(Vector2f(48 * 5 + 48 * 10, 48 * 11), obstacleLightTexture32));
 
-		temp.push_back(Obstacle(Vector2f(32 * 3 + 32 * 10, 32 * 1), obstacleLightTexture64));
-		temp.push_back(Obstacle(Vector2f(32 * 8 + 32 * 10, 32 * 6), obstacleLightTexture64));
-		temp.push_back(Obstacle(Vector2f(32 * 3 + 32 * 10, 32 * 11), obstacleLightTexture64));
+		temp.push_back(Obstacle(Vector2f(48 * 3 + 48 * 10, 48 * 1), obstacleLightTexture64));
+		temp.push_back(Obstacle(Vector2f(48 * 8 + 48 * 10, 48 * 6), obstacleLightTexture64));
+		temp.push_back(Obstacle(Vector2f(48 * 3 + 48 * 10, 48 * 11), obstacleLightTexture64));
 		break;
 	}
 	return temp;
@@ -130,7 +162,7 @@ std::vector<Obstacle> obstacles = loadObstacles(level);
 bool gameRunning = true;
 bool mouseDown = false;
 bool mousePressed = false;
-bool keyDown = false;
+bool move = false;
 
 bool swingPlayed = false;
 bool secondSwingPlayed = false;
@@ -153,23 +185,25 @@ void loadLevel(int level)
 	}
 
 	obstacles = loadObstacles(level);
+	rivers = loadRivers(level);
+	bridges = loadBridges(level);
 
 	switch (level)
 	{
 	case 1:
-		player.setPos(24 + 32 * 4, 24 + 32 * 11);
+		player.setPos(36 + 48 * 4, 36 + 48 * 11);
 		break;
 	case 2:
-		player.setPos(24 + 32 * 4, 24 + 32 * 11);
+		player.setPos(36 + 48 * 4, 36 + 48 * 11);
 		break;
 	case 3:
-		player.setPos(24 + 32 * 7, 24 + 32 * 10);
+		player.setPos(36 + 48 * 7, 36 + 48 * 10);
 		break;
 	case 4:
-		player.setPos(24 + 32 * 4, 24 + 32 * 11);
+		player.setPos(36 + 48 * 4, 36 + 48 * 11);
 		break;
 	case 5:
-		player.setPos(24 + 32 * 2, 24 + 32 * 12);
+		player.setPos(36 + 48 * 2, 36 + 48 * 12);
 		break;
 	}
 }
@@ -200,7 +234,7 @@ std::string getMapText()
 
 std::string getLevelText(int side)
 {
-	int tempLevel = (level + 1) * 2 - 1;
+	int tempLevel = (level + 1) * 2 - 3;
 	if (side == 1)
 	{
 		tempLevel++;
@@ -230,7 +264,8 @@ void update()
 			{
 				mouseDown = true;
 				mousePressed = true;
-				bullets.push_back(Bullet(player.getCenter(), player.getAim(), bulletTexture));
+				if (bullets.size() < 5)
+					bullets.push_back(Bullet(player.getCenter(), player.getAim(), bulletTexture, shootSfx));
 			}
 			break;
 		case SDL_MOUSEBUTTONUP:
@@ -267,42 +302,63 @@ void update()
 				loadLevel(level);
 				break;
 			case SDLK_SPACE:
-				player.addHealth(1);
+				player.addHealth(2);
 				break;
 			case SDLK_UP: case SDLK_w:
-				keyDown = true;
+				move = true;
 				player.setDir(UP);
 				break;
 			case SDLK_DOWN: case SDLK_s:
-				keyDown = true;
+				move = true;
 				player.setDir(DOWN);
 				break;
 			case SDLK_LEFT: case SDLK_a:
-				keyDown = true;
+				move = true;
 				player.setDir(LEFT);
 				break;
 			case SDLK_RIGHT: case SDLK_d:
-				keyDown = true;
+				move = true;
 				player.setDir(RIGHT);
 				break;
 			default:
-				keyDown = false;
+				move = false;
 				break;
 			}
 			break;
 		case SDL_KEYUP:
-			keyDown = false;
+			move = false;
 			break;
 		}
 	}
 
 	if (state == 1)
 	{
+		switch (level)
+		{
+		case 1:
+			if (player.getPos().y >= 720 - player.getCurrentFrame().h * player.getScale().y && player.getPos().x > 480 - 40 && player.getPos().x + player.getCurrentFrame().w * player.getScale().x < 480 + 40 && move && player.getDir() == DOWN)
+			{
+				level++; int tempx = player.getPos().x;
+				loadLevel(level);
+				player.setPos(tempx, 0);
+			}
+			break;
+
+		case 2:
+			if (player.getPos().y <= player.getCurrentFrame().h * player.getScale().y && player.getPos().x > 480 - 40 && player.getPos().x + player.getCurrentFrame().w * player.getScale().x < 480 + 40 && move && player.getDir() == UP)
+			{
+				level--; int tempx = player.getPos().x;
+				loadLevel(level);
+				player.setPos(tempx, 720 - player.getCurrentFrame().h * player.getScale().y);
+			}
+			break;
+		}
+
 		if (player.isDead())
 		{
 			state = 2;
 		}
-		player.update(deltaTime, keyDown, obstacles);
+		player.update(deltaTime, move, obstacles, rivers, bridges);
 		for (Bullet& b : bullets)
 		{
 			b.update(deltaTime, mouseDown, mousePressed, obstacles);
@@ -316,13 +372,28 @@ void graphics()
 {
 	window.clear();
 	window.render(0, 0, bgTexture);
-	for (Bullet& b : bullets)
+	if (state != 2)
 	{
-		window.render(b);
+		window.render(40, 720 + 5, getMapText().c_str(), font24, white);
+		window.render(240 + 40, 720 + 5, getPointText().c_str(), font24, white);
+		window.render(480 + 40, 720 + 5, getLevelText(0).c_str(), font24, white);
+		window.render(720 + 40, 720 + 5, getLevelText(1).c_str(), font24, white);
 	}
 	for (Obstacle& t : obstacles)
 	{
 		window.render(t);
+	}
+	for (Entity& r : rivers)
+	{
+		window.render(r);
+	}
+	for (Entity& b : bridges)
+	{
+		window.render(b);
+	}
+	for (Bullet& b : bullets)
+	{
+		window.render(b);
 	}
 	window.render(player);
 	for (Entity& h : player.getHealthBar())
@@ -330,21 +401,7 @@ void graphics()
 		window.render(h);
 	}
 	window.render(mouse);
-	if (state != 2)
-	{
-		window.render(640 / 4 - 132 / 2, 480 - 32, levelTextBgTexture);
-		window.renderCenter(-160, 240 - 16 + 3, getLevelText(0).c_str(), font24, black);
-		window.renderCenter(-160, 240 - 16, getLevelText(0).c_str(), font24, white);
-
-		window.render(640 / 2 + 640 / 4 - 132 / 2, 480 - 32, levelTextBgTexture);
-		window.renderCenter(160, 240 - 16 + 3, getLevelText(1).c_str(), font24, black);
-		window.renderCenter(160, 240 - 16, getLevelText(1).c_str(), font24, white);
-
-		window.render(640 / 2 - 196 / 2, 0, uiBgTexture); 
-		window.render(320 - 82, 3, (getPointText() + "    " + getMapText()).c_str(), font24, black);
-		window.render(320 - 82, 0, (getPointText() + "    " + getMapText()).c_str(), font24, white);
-	}
-	else
+	if (state == 2)
 	{
 		window.render(0, 0, endscreenOverlayTexture);
 		window.renderCenter(0, 3 - 32, getEndingText().c_str(), font48, black);
@@ -411,16 +468,16 @@ void titleScreen()
 			}
 		}
 		window.clear();
-		mouse.update();
-		window.render(mouse);
 		window.render(0, 0, bgTexture);
 		window.renderCenter(3, - 10 + 3 - 50 + 4 * SDL_sin(SDL_GetTicks() * (3.14 / 1500)), "Some Title", fontTitle, black);
 		window.renderCenter(0, - 10 - 50 + 4 * SDL_sin(SDL_GetTicks() * (3.14 / 1500)), "Some Title", fontTitle, white);
 		window.renderCenter(3, 40 + 3 - 50 + 4 * SDL_sin(SDL_GetTicks() * (3.14 / 1500)), "Some Subtitle", font32, black);
 		window.renderCenter(0, 40 - 50 + 4 * SDL_sin(SDL_GetTicks() * (3.14 / 1500)), "Some Subtitle", font32, white);
-		window.render(0, -40, click2start);
+		window.render(160, 80, click2start);
 		window.renderCenter(0, 200 - 48 + 3 - 16 * 5, "LEFT CLICK TO START", font32, black);
 		window.renderCenter(0, 200 - 48 - 16 * 5, "LEFT CLICK TO START", font32, white);
+		mouse.update();
+		window.render(mouse);
 		window.display();
 	}
 }
@@ -439,7 +496,7 @@ void game()
 }
 
 int main(int argc, char* args[])
-{
+{ 
 	loadLevel(level);
 	while (gameRunning)
 	{

@@ -7,13 +7,15 @@
 #include <vector>
 #include <windows.h>
 #include <SDL.h>
+#include <SDL_mixer.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
 
-Bullet::Bullet(Vector2f p_pos, double angle, SDL_Texture* p_tex)
+Bullet::Bullet(Vector2f p_pos, double angle, SDL_Texture* p_tex, Mix_Chunk* shootSfx)
 	:Entity(p_pos, p_tex)
 {
+    Mix_PlayChannel(-1, shootSfx, 0);
     setVelocity(velocity1D * cos(angle), velocity1D * sin(angle));
 }
 
@@ -28,38 +30,16 @@ void Bullet::setLaunchedVelocity(float x, float y)
     launchedVelocity.x = x;
     launchedVelocity.y = y;
 }
+
 void Bullet::setHit(bool p_hit)
 {
     hit = p_hit;
 }
 
-bool intilex(int x, Obstacle o, int h, int w)
+bool Bullet::hitObs(Obstacle o)
 {
-    if (x + w > o.getPos().x && x < o.getPos().x + o.getCurrentFrame().w)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool intiley(int y, Obstacle o, int h, int w)
-{
-    if (y + h > o.getPos().y && y < o.getPos().y + o.getCurrentFrame().h)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool intile(Vector2f pos, Obstacle o, int h, int w)
-{
-    if (intilex(pos.x, o, h, w) && intiley(pos.y, o, h, w))
+    if (getPos().x + getCurrentFrame().w * getScale().x > o.getPos().x && getPos().x < o.getPos().x + o.getCurrentFrame().w
+        && getPos().y + getCurrentFrame().h * getScale().y > o.getPos().y && getPos().y < o.getPos().y + o.getCurrentFrame().h)
     {
         return true;
     }
@@ -74,78 +54,60 @@ void Bullet::update(double deltaTime, bool mouseDown, bool mousePressed, std::ve
     bool addhit = false;
     if (hit_times >= 3)
     {
-        setHit(true);
+        hit = true;
     }
-    if (hit)
-    {
-        if (getPos().x < target.x)
-        {
-            setPos(getPos().x += 0.1 * deltaTime, getPos().y);
-        }
-        else if (getPos().x > target.x)
-        {
-            setPos(getPos().x -= 0.1 * deltaTime, getPos().y);
-        }
-        if (getPos().y < target.y)
-        {
-            setPos(getPos().x, getPos().y += 0.1 * deltaTime);
-        }
-        else if (getPos().y > target.y)
-        {
-            setPos(getPos().x, getPos().y -= 0.1 * deltaTime);
-        }
-        setScale(getScale().x - 0.001 * deltaTime, getScale().y - 0.001 * deltaTime);
-        return;
-    }
-    
-    setPos(getPos().x + getVelocity().x * deltaTime, getPos().y + getVelocity().y * deltaTime);
-    
-    
 
+    Vector2f deltaX = Vector2f(getVelocity().x * deltaTime, 0);
+    Vector2f deltaY = Vector2f(0, getVelocity().y * deltaTime);
+
+    if ((getPos() + deltaX).x + getCurrentFrame().w > 960)
+    {
+        setVelocity(-abs(getVelocity().x), getVelocity().y);
+        dirX = -1; addhit = true;
+    }
+    else if ((getPos() + deltaX).x < 0)
+    {
+        setVelocity(abs(getVelocity().x), getVelocity().y);
+        dirX = 1; addhit = true;
+    }
+    if ((getPos() + deltaY).y + getCurrentFrame().h > 720)
+    {
+        setVelocity(getVelocity().x, -abs(getVelocity().y));
+        dirY = -1; addhit = true;
+    }
+    else if ((getPos() + deltaY).y < 0)
+    {
+        setVelocity(getVelocity().x, abs(getVelocity().y));
+        dirY = 1; addhit = true;
+    }
+
+    Vector2f currentPos = Vector2f(getPos());
+        
     for (Obstacle& o : obstacles)
     {
-        //Vector2f newPosXY = Vector2f(getPos().x + getVelocity().x * deltaTime, getPos().y + getVelocity().y * deltaTime);
-        float v_x, v_y;
-        Vector2f newPosX = Vector2f(getPos().x + getVelocity().x * deltaTime, getPos().y);
-        Vector2f newPosY = Vector2f(getPos().x, getPos().y + getVelocity().y * deltaTime);
-        
-        if (newPosX.x + getCurrentFrame().w > 640)
+        setPos(currentPos);
+        if (!hitObs(o))
         {
-            setVelocity(-abs(getVelocity().x), getVelocity().y);
-            dirX = -1; addhit = true;
-        }
-        else if (newPosX.x < 0)
-        {
-            setVelocity(abs(getVelocity().x), getVelocity().y);
-            dirX = 1; addhit = true;
-        }
-        else if (newPosY.y + getCurrentFrame().h > 480)
-        {
-            setVelocity(getVelocity().x, -abs(getVelocity().y));
-            dirY = -1; addhit = true;
-        }
-        else if (newPosY.y < 0)
-        {
-            setVelocity(getVelocity().x, abs(getVelocity().y));
-            dirY = 1; hit_times++;
-        }
-        
-        if (intile(Vector2f(getPos().x + getVelocity().x * deltaTime, getPos().y), o, getCurrentFrame().h, getCurrentFrame().w) && !intile(Vector2f(getPos().x/**/ - getVelocity().x * deltaTime, getPos().y), o, getCurrentFrame().h, getCurrentFrame().w))
-        {
-            setVelocity(getVelocity().x * -1, getVelocity().y);
-            dirX *= -1; addhit = true;
-        }
-        if (intile(Vector2f(getPos().x, getPos().y + getVelocity().y * deltaTime), o, getCurrentFrame().h, getCurrentFrame().w) && !intile(Vector2f(getPos().x, getPos().y - getVelocity().y * deltaTime), o, getCurrentFrame().h, getCurrentFrame().w))
-        {
-            setVelocity(getVelocity().x, getVelocity().y * -1);
-            dirY *= -1; addhit = true; 
-        }
-        if (intile(Vector2f(getPos().x + getVelocity().x * deltaTime, getPos().y + getVelocity().y * deltaTime), o, getCurrentFrame().h, getCurrentFrame().w) && !intile(Vector2f(getPos().x - getVelocity().x * deltaTime, getPos().y - getVelocity().y * deltaTime), o, getCurrentFrame().h, getCurrentFrame().w))
-        {
-            setVelocity(getVelocity().x * -1, getVelocity().y * -1);
-            dirX *= -1; dirY *= -1; addhit = true;
+            setPos(currentPos + deltaX);
+            if (hitObs(o))
+            {
+                setVelocity(getVelocity().x * -1, getVelocity().y);
+                dirX *= -1; addhit = true;
+            }
+            setPos(currentPos + deltaY);
+            if (hitObs(o))
+            {
+                setVelocity(getVelocity().x, getVelocity().y * -1);
+                dirY *= -1; addhit = true;
+            }
+            setPos(currentPos + deltaX + deltaY);
+            if (!addhit && hitObs(o))
+            {
+                setVelocity(getVelocity().x * -1, getVelocity().y * -1);
+                dirX *= -1; dirY *= -1; addhit = true;
+            }
         }
     }
     if (addhit) { hit_times++; }
-    setPos(getPos().x + getVelocity().x * deltaTime, getPos().y + getVelocity().y * deltaTime);
+    setPos(currentPos + deltaX + deltaY);
 }
