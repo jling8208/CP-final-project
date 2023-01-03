@@ -42,38 +42,27 @@ void RenderWindow::clear()
 
 void RenderWindow::render(Entity& p_entity)
 {
-	SDL_Rect src;
-	src.x = p_entity.getCurrentFrame().x;
-	src.y = p_entity.getCurrentFrame().y;
-	src.w = p_entity.getCurrentFrame().w;
-	src.h = p_entity.getCurrentFrame().h;
-
 	SDL_Rect dst;
 	dst.x = p_entity.getPos().x;
 	dst.y = p_entity.getPos().y;
 	dst.w = p_entity.getCurrentFrame().w * p_entity.getScale().x;
 	dst.h = p_entity.getCurrentFrame().h * p_entity.getScale().y;
 
-	SDL_RenderCopyEx(renderer, p_entity.getTex(), &src, &dst, p_entity.getAngle(), 0, SDL_FLIP_NONE);
+	SDL_RenderCopyEx(renderer, p_entity.getTex(), NULL, &dst, p_entity.getAngle(), 0, SDL_FLIP_NONE);
 }
 
-void RenderWindow::render(int x, int y, SDL_Texture* p_tex)
+void RenderWindow::render(int p_x, int p_y, SDL_Texture* p_tex)
 {
-	SDL_Rect src;
-	src.x = 0;
-	src.y = 0;
-	src.w;
-	src.h;
-
-	SDL_QueryTexture(p_tex, NULL, NULL, &src.w, &src.h);
+	int x, y;
+	SDL_QueryTexture(p_tex, NULL, NULL, &x, &y);
 
 	SDL_Rect dst;
-	dst.x = x;
-	dst.y = y;
-	dst.w = src.w;
-	dst.h = src.h;
+	dst.x = p_x;
+	dst.y = p_y;
+	dst.w = x;
+	dst.h = y;
 
-	SDL_RenderCopy(renderer, p_tex, &src, &dst);
+	SDL_RenderCopy(renderer, p_tex, NULL, &dst);
 }
 
 void RenderWindow::render(float p_x, float p_y, const char* p_text, TTF_Font* font, SDL_Color textColor)
@@ -88,105 +77,30 @@ void RenderWindow::render(float p_x, float p_y, const char* p_text, TTF_Font* fo
 		return;
 	}
 
-	SDL_Rect src;
-	src.x = 0;
-	src.y = 0;
-	src.w = surfaceMessage->w;
-	src.h = surfaceMessage->h;
-
 	SDL_Rect dst;
+	TTF_SizeText(font, p_text, &dst.w, &dst.h);
 	dst.x = p_x;
 	dst.y = p_y;
-	dst.w = src.w;
-	dst.h = src.h;
 
-	SDL_RenderCopy(renderer, message, &src, &dst);
+	SDL_RenderCopy(renderer, message, NULL, &dst);
 	SDL_DestroyTexture(message);
 	SDL_FreeSurface(surfaceMessage);
 }
 
 void RenderWindow::renderTextCenter(float p_x, float p_y, const char* p_text, TTF_Font* font, SDL_Color textColor, SDL_Color textColor_sh)
 {
-	SDL_Surface* surfaceMessage = TTF_RenderText_Blended(font, p_text, textColor_sh);
-	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
-
-	if (surfaceMessage == nullptr)
-	{
-		SDL_DestroyTexture(message);
-		SDL_FreeSurface(surfaceMessage);
-		return;
-	}
-
-	SDL_Rect src;
-	src.x = 0;
-	src.y = 0;
-	src.w = surfaceMessage->w;
-	src.h = surfaceMessage->h;
-
-	SDL_Rect dst;
-	dst.x = 960 / 2 - src.w / 2 + p_x;
-	dst.y = 720 / 2 - src.h / 2 + p_y + 3;
-	dst.w = src.w;
-	dst.h = src.h;
-
-	SDL_RenderCopy(renderer, message, &src, &dst);
-
-	surfaceMessage = TTF_RenderText_Blended(font, p_text, textColor);
-	message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
-	dst.y = 720 / 2 - src.h / 2 + p_y;
-
-	SDL_RenderCopy(renderer, message, &src, &dst);
-
-	SDL_DestroyTexture(message);
-	SDL_FreeSurface(surfaceMessage);
+	int x, y;
+	TTF_SizeText(font, p_text, &x, &y);
+	render(p_x - x / 2 + 480, p_y - y / 2 + 360 + 3, p_text, font, textColor_sh);
+	render(p_x - x / 2 + 480, p_y - y / 2 + 360, p_text, font, textColor);
 }
 
 void RenderWindow::renderOptionCentered(float p_x, float p_y, SDL_Texture* p_tex, const char* p_text, TTF_Font* font, SDL_Color textColor, SDL_Color textColor_sh)
 {
-	SDL_Rect src;
-	src.x = 0;
-	src.y = 0;
-	src.w;
-	src.h;
-
-	SDL_QueryTexture(p_tex, NULL, NULL, &src.w, &src.h);
-
-	SDL_Rect dst;
-	dst.x = p_x - src.w / 2;
-	dst.y = p_y - src.h / 2;
-	dst.w = src.w;
-	dst.h = src.h;
-
-	SDL_RenderCopy(renderer, p_tex, &src, &dst);
-
-	static SDL_Surface* surfaceMessage; surfaceMessage = TTF_RenderText_Blended(font, p_text, textColor_sh);
-	static SDL_Texture* message; message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
-	std::cout << surfaceMessage << "\n";
-	if (surfaceMessage == nullptr)
-	{
-		SDL_FreeSurface(surfaceMessage);
-		SDL_DestroyTexture(message);
-		return;
-	}
-
-	src.w = surfaceMessage->w;
-	src.h = surfaceMessage->h;
-
-	dst.x = p_x - src.w / 2;
-	dst.y = p_y - src.h / 2 + 3;
-	dst.w = src.w;
-	dst.h = src.h;
-
-	SDL_RenderCopy(renderer, message, &src, &dst);
-
-	surfaceMessage = TTF_RenderText_Blended(font, p_text, textColor);
-	message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
-	dst.y = p_y - src.h / 2;
-
-	SDL_RenderCopy(renderer, message, &src, &dst);
-
-	SDL_DestroyTexture(message);
-	SDL_FreeSurface(surfaceMessage);
+	int x, y;
+	SDL_QueryTexture(p_tex, NULL, NULL, &x, &y);
+	render(p_x - x / 2, p_y - y / 2, p_tex);
+	renderTextCenter(p_x - 480, p_y - 360, p_text, font, textColor, textColor_sh);
 }
 
 void RenderWindow::display()

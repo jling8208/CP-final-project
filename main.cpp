@@ -22,7 +22,7 @@
 bool init()
 {
 	if (SDL_Init(SDL_INIT_VIDEO) > 0)
-		std::cout << "HEY.. SDL_Init HAS FAILED. SDL_ERROR: " << SDL_GetError() << std::endl;
+		std::cout << "SDL_Init HAS FAILED. Error: " << SDL_GetError() << std::endl;
 	if (!(IMG_Init(IMG_INIT_PNG)))
 		std::cout << "IMG_init has failed. Error: " << SDL_GetError() << std::endl;
 	if (TTF_Init() < 0)
@@ -428,7 +428,7 @@ void update()
 		buffWhere[3] = index;
 	}
 
-	loadBuff(0, (monsters.size() > 3), []() { shield.setPos(player.getCenter() - Vector2f(shield.getCurrentFrame().w / 2, shield.getCurrentFrame().h / 2)); }, []() {});
+	loadBuff(0, (monsters.size() > 3 && timer(5000)), []() { shield.setPos(player.getCenter() - Vector2f(shield.getCurrentFrame().w / 2, shield.getCurrentFrame().h / 2)); }, []() {});
 	if (level <= 0)
 	{
 		loadBuff(1, (monsters.size() > 3 && timer(15000)), []() { player.setV_factor(1.5); }, []() { player.setV_factor(1); });
