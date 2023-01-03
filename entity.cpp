@@ -7,6 +7,8 @@ Entity::Entity(Vector2f p_pos, SDL_Texture* p_tex)
 {
 	currentFrame.x = 0;
 	currentFrame.y = 0;
+	//currentFrame.w = 32;
+	//currentFrame.h = 32;
 	SDL_QueryTexture(p_tex, NULL, NULL, &currentFrame.w, &currentFrame.h);
 }
 
@@ -26,9 +28,22 @@ void Entity::setPos(float x, float y)
 	pos.y = y;
 }
 
+void Entity::setPos(Vector2f newPos)
+{
+	pos = newPos;
+}
+
 void Entity::setDir(direction p_dir)
 {
 	dir = p_dir;
+}
+
+void Entity::setScale(float w, float h)
+{
+	scale.x = w;
+	scale.y = h;
+	//currentFrame.w *= w;
+	//currentFrame.h *= h;
 }
 
 void Entity::setAngle(float p_angle)
@@ -36,13 +51,18 @@ void Entity::setAngle(float p_angle)
 	angle = p_angle;
 }
 
-void Entity::setScale(float w, float h)
+void Entity::setTex(SDL_Texture* newTex)
 {
-	scale.x = w;
-	scale.y = h;
+	tex = newTex;
 }
 
 SDL_Rect Entity::getCurrentFrame()
 {
 	return currentFrame;
+}
+
+Vector2f Entity::getCenter()
+{
+	Vector2f center = Vector2f(getPos().x + getCurrentFrame().w * getScale().x / 2, getPos().y + getCurrentFrame().h * getScale().y / 2);
+	return center;
 }

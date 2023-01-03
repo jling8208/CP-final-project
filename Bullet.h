@@ -3,34 +3,36 @@
 #include <SDL_mixer.h>
 #include <SDL_image.h>
 #include <vector>
-#include "Hole.h"
 #include "Obstacle.h"
 
 #include "Entity.h"
+#include "Movable.h"
 #include "Math.h"
 
-class Bullet : public Entity
+class Bullet : public Movable
 {
 public:
-    Bullet(Vector2f p_pos, double angle, SDL_Texture* p_tex, Mix_Chunk* shootSfx);
-    Vector2f& getVelocity()
+    Bullet(Vector2f p_pos, float p_damage, double angle, SDL_Texture* p_tex, Mix_Chunk* shootSfx);
+    float getDamage()
     {
-        return velocity;
+        return damage;
+    }
+    void setDamage(float p_damage)
+    {
+        damage = p_damage;
     }
     bool isHit()
     {
         return hit;
     }
     void setHit(bool p_hit);
-    void setVelocity(float x, float y);
     void setLaunchedVelocity(float x, float y);
-    bool hitObs(Obstacle o);
-    void update(double deltaTime, bool mouseDown, bool mousePressed, std::vector<Obstacle> obstacles);
+    void update(double deltaTime);
 private:
-    Vector2f velocity;
+    float damage = 0;
     Vector2f target;
     Vector2f launchedVelocity;
-    float velocity1D = 0.6;
+    float velocity1D = 0.4;
     Vector2f initialMousePos;
     int dirX = 1;
     int dirY = 1;

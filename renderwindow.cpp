@@ -98,10 +98,15 @@ void RenderWindow::render(float p_x, float p_y, const char* p_text, TTF_Font* fo
 	SDL_DestroyTexture(message);
 }
 
-void RenderWindow::renderCenter(float p_x, float p_y, const char* p_text, TTF_Font* font, SDL_Color textColor)
+void RenderWindow::renderTextCenter(float p_x, float p_y, const char* p_text, TTF_Font* font, SDL_Color textColor, SDL_Color textColor_sh)
 {
-	SDL_Surface* surfaceMessage = TTF_RenderText_Blended(font, p_text, textColor);
+	SDL_Surface* surfaceMessage = TTF_RenderText_Blended(font, p_text, textColor_sh);
 	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+
+	if (surfaceMessage == nullptr)
+	{
+		return;
+	}
 
 	SDL_Rect src;
 	src.x = 0;
@@ -111,11 +116,64 @@ void RenderWindow::renderCenter(float p_x, float p_y, const char* p_text, TTF_Fo
 
 	SDL_Rect dst;
 	dst.x = 960 / 2 - src.w / 2 + p_x;
-	dst.y = 720 / 2 - src.h / 2 + p_y;
+	dst.y = 720 / 2 - src.h / 2 + p_y + 3;
 	dst.w = src.w;
 	dst.h = src.h;
 
 	SDL_RenderCopy(renderer, message, &src, &dst);
+
+	surfaceMessage = TTF_RenderText_Blended(font, p_text, textColor);
+	message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+	dst.y = 720 / 2 - src.h / 2 + p_y;
+
+	SDL_RenderCopy(renderer, message, &src, &dst);
+
+	SDL_FreeSurface(surfaceMessage);
+	SDL_DestroyTexture(message);
+}
+
+void RenderWindow::renderOptionCentered(float p_x, float p_y, SDL_Texture* p_tex, const char* p_text, TTF_Font* font, SDL_Color textColor, SDL_Color textColor_sh)
+{
+	SDL_Rect src;
+	src.x = 0;
+	src.y = 0;
+	src.w;
+	src.h;
+
+	SDL_QueryTexture(p_tex, NULL, NULL, &src.w, &src.h);
+
+	SDL_Rect dst;
+	dst.x = p_x - src.w / 2;
+	dst.y = p_y - src.h / 2;
+	dst.w = src.w;
+	dst.h = src.h;
+
+	SDL_RenderCopy(renderer, p_tex, &src, &dst);
+
+	SDL_Surface* surfaceMessage = TTF_RenderText_Blended(font, p_text, textColor_sh);
+	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+
+	if (surfaceMessage == nullptr)
+	{
+		return;
+	}
+
+	src.w = surfaceMessage->w;
+	src.h = surfaceMessage->h;
+
+	dst.x = p_x - src.w / 2;
+	dst.y = p_y - src.h / 2 + 3;
+	dst.w = src.w;
+	dst.h = src.h;
+
+	SDL_RenderCopy(renderer, message, &src, &dst);
+
+	surfaceMessage = TTF_RenderText_Blended(font, p_text, textColor);
+	message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+	dst.y = p_y - src.h / 2;
+
+	SDL_RenderCopy(renderer, message, &src, &dst);
+
 	SDL_FreeSurface(surfaceMessage);
 	SDL_DestroyTexture(message);
 }

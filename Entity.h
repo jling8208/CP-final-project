@@ -1,8 +1,8 @@
 #pragma once
-
-#include "Entity.h"
-#include "Math.h"
 #include <SDL.h>
+#include <SDL_image.h>
+
+#include "Math.h"
 
 enum direction { DEFAULT, UP, DOWN, LEFT, RIGHT };
 
@@ -18,18 +18,30 @@ public:
 	{
 		return dir;
 	}
+	float getAngle()
+	{
+		return angle;
+	}
 	Vector2f getScale()
 	{
 		return scale;
 	}
-	SDL_Texture* getTex();
-	void update();
 	void setPos(float x, float y);
+	void setPos(Vector2f newPos);
 	void setDir(direction dir);
+	void setScale(float w, float h);
+	void setAngle(float angle);
+	void setTex(SDL_Texture* newTex);
+	SDL_Texture* getTex();
+	void update(double deltaTime);
 	SDL_Rect getCurrentFrame();
+	Vector2f getCenter();
 private:
 	Vector2f pos;
 	direction dir = DEFAULT;
+	float angle = 0;
+	Vector2f scale = Vector2f(1, 1);
 	SDL_Rect currentFrame;
+protected:
 	SDL_Texture* tex;
 };

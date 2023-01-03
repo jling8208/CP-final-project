@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Entity.h"
+#include "Movable.h"
 #include "Math.h"
 #include "Obstacle.h"
 
@@ -11,32 +12,12 @@
 #include <SDL_mixer.h>
 
 Player::Player(Vector2f p_pos, SDL_Texture* p_tex_l, SDL_Texture* p_tex_r, SDL_Texture* p_healthMTexFG, SDL_Texture* p_healthMTexBG, SDL_Texture* p_healthMTexFrame)
-    :Entity(p_pos, p_tex_r), tex_l (p_tex_l), tex_r(p_tex_r)
+    :Movable(p_pos, p_tex_r), tex_l (p_tex_l), tex_r(p_tex_r)
 {
-    setScale(0.5, 0.5);
+    //setScale(0.5, 0.5);
     healthBar.push_back(Entity(Vector2f(-64, -64), p_healthMTexBG));
     healthBar.push_back(Entity(Vector2f(-64, -64), p_healthMTexFG));
     healthBar.push_back(Entity(Vector2f(-64, -64), p_healthMTexFrame));
-    //healthBar.at(0).setScale(0.7, 0.7);
-    //healthBar.at(1).setScale(0.7, 0.7);
-    //healthBar.at(2).setScale(0.7, 0.7);
-}
-
-Vector2f& Player::getCenter()
-{
-    Vector2f center = Vector2f(getPos().x + getCurrentFrame().w * getScale().x / 2, getPos().y + getCurrentFrame().h * getScale().y / 2);
-    return center;
-}
-
-void Player::setVelocity(float x, float y)
-{
-    velocity.x = x;
-    velocity.y = y;
-}
-
-void Player::setV_factor(float f)
-{
-    v_factor = f;
 }
 
 void Player::setInitialMousePos(float x, float y)
@@ -81,13 +62,13 @@ bool Player::hitObs(Entity o)
     }
 }
 
-void Player::update(double deltaTime, bool move, std::vector<Obstacle> obstacles, std::vector<Entity> rivers, std::vector<Entity> bridges)
+bool Player::upside()
 {
-    healthBar.at(0).setPos(getCenter().x - 32 /*healthBar.at(0).getCurrentFrame().w / 2*/, getPos().y + 55);
-    healthBar.at(1).setPos(getCenter().x - 29 /*healthBar.at(1).getCurrentFrame().w / 2*/, getPos().y + 55 + 3);
-    healthBar.at(2).setPos(getCenter().x - 32 /*healthBar.at(0).getCurrentFrame().w / 2*/, getPos().y + 55);
-    healthBar.at(1).setScale(health / 100, 1); //healthBar.at(1).setScale(health / 100 * 0.7, 0.7);
+    return (getCenter().y < 360);
+}
 
+void Player::update(double deltaTime, bool move, std::vector<Obstacle> rivers, std::vector<Obstacle> bridges)
+{
     if (move)
     {
         switch (Entity::getDir())
@@ -145,29 +126,10 @@ void Player::update(double deltaTime, bool move, std::vector<Obstacle> obstacles
     }
 
     Vector2f currentPos = Vector2f(getPos());
-    Vector2f deltaX = Vector2f(getVelocity().x * deltaTime, 0);
-    Vector2f deltaY = Vector2f(0, getVelocity().y * deltaTime);
+    Vector2f deltaX = Vector2f(getVelocity().x * deltaTime * getV_factor(), 0);
+    Vector2f deltaY = Vector2f(0, getVelocity().y * deltaTime * getV_factor());
 
-    for (Obstacle& o : obstacles)
-    {
-        setPos(currentPos);
-        if (!hitObs(o))
-        {
-            setPos(currentPos + deltaX);
-            if (hitObs(o))
-            {
-                setVelocity(0, getVelocity().y); addHealth(-0.5);
-            }
-            
-            setPos(currentPos + deltaY);
-            if (hitObs(o))
-            {
-                setVelocity(getVelocity().x, 0); addHealth(-0.5);
-            }
-        }
-    }
-
-    for (Entity& r : rivers)
+    for (Obstacle& r : rivers)
     {
         bool onRiver = false;
         setPos(currentPos + deltaX);
@@ -184,7 +146,7 @@ void Player::update(double deltaTime, bool move, std::vector<Obstacle> obstacles
 
         if (onRiver)
         {
-            for (Entity& b : bridges)
+            for (Obstacle& b : bridges)
             {
                 setPos(currentPos + deltaX + deltaY);
                 if (getPos().x > b.getPos().x && getPos().x + getCurrentFrame().w * getScale().x < b.getPos().x + b.getCurrentFrame().w)
@@ -201,5 +163,9 @@ void Player::update(double deltaTime, bool move, std::vector<Obstacle> obstacles
         }
     }
 
-    setPos((currentPos + Vector2f(getVelocity().x * deltaTime, getVelocity().y * deltaTime)) * v_factor);
+    setPos((currentPos + (Vector2f(getVelocity().x * deltaTime, getVelocity().y * deltaTime)) * getV_factor()));
+    healthBar.at(0).setPos(getCenter().x - 32, getPos().y + getCurrentFrame().h * 1.2);
+    healthBar.at(1).setPos(getCenter().x - 29, getPos().y + getCurrentFrame().h * 1.2 + 3);
+    healthBar.at(2).setPos(getCenter().x - 32, getPos().y + getCurrentFrame().h * 1.2);
+    healthBar.at(1).setScale(health / 100, 1);
 }

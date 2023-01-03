@@ -1,8 +1,8 @@
 #include "Bullet.h"
 #include "Entity.h"
+#include "Movable.h"
 #include "Math.h"
 #include "Obstacle.h"
-#include "Hole.h"
 
 #include <vector>
 #include <windows.h>
@@ -12,17 +12,11 @@
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
 
-Bullet::Bullet(Vector2f p_pos, double angle, SDL_Texture* p_tex, Mix_Chunk* shootSfx)
-	:Entity(p_pos, p_tex)
+Bullet::Bullet(Vector2f p_pos, float p_damage, double angle, SDL_Texture* p_tex, Mix_Chunk* shootSfx)
+	:Movable(p_pos, p_tex), damage(p_damage)
 {
     Mix_PlayChannel(-1, shootSfx, 0);
     setVelocity(velocity1D * cos(angle), velocity1D * sin(angle));
-}
-
-void Bullet::setVelocity(float x, float y)
-{
-    velocity.x = x;
-    velocity.y = y;
 }
 
 void Bullet::setLaunchedVelocity(float x, float y)
@@ -36,23 +30,10 @@ void Bullet::setHit(bool p_hit)
     hit = p_hit;
 }
 
-bool Bullet::hitObs(Obstacle o)
-{
-    if (getPos().x + getCurrentFrame().w * getScale().x > o.getPos().x && getPos().x < o.getPos().x + o.getCurrentFrame().w
-        && getPos().y + getCurrentFrame().h * getScale().y > o.getPos().y && getPos().y < o.getPos().y + o.getCurrentFrame().h)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-void Bullet::update(double deltaTime, bool mouseDown, bool mousePressed, std::vector<Obstacle> obstacles)
+void Bullet::update(double deltaTime)
 {
     bool addhit = false;
-    if (hit_times >= 3)
+    if (hit_times >= 2)
     {
         hit = true;
     }
@@ -81,33 +62,6 @@ void Bullet::update(double deltaTime, bool mouseDown, bool mousePressed, std::ve
         dirY = 1; addhit = true;
     }
 
-    Vector2f currentPos = Vector2f(getPos());
-        
-    for (Obstacle& o : obstacles)
-    {
-        setPos(currentPos);
-        if (!hitObs(o))
-        {
-            setPos(currentPos + deltaX);
-            if (hitObs(o))
-            {
-                setVelocity(getVelocity().x * -1, getVelocity().y);
-                dirX *= -1; addhit = true;
-            }
-            setPos(currentPos + deltaY);
-            if (hitObs(o))
-            {
-                setVelocity(getVelocity().x, getVelocity().y * -1);
-                dirY *= -1; addhit = true;
-            }
-            setPos(currentPos + deltaX + deltaY);
-            if (!addhit && hitObs(o))
-            {
-                setVelocity(getVelocity().x * -1, getVelocity().y * -1);
-                dirX *= -1; dirY *= -1; addhit = true;
-            }
-        }
-    }
     if (addhit) { hit_times++; }
-    setPos(currentPos + deltaX + deltaY);
+    setPos(getPos() + deltaX + deltaY);
 }
