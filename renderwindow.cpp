@@ -82,7 +82,7 @@ void RenderWindow::render(float p_x, float p_y, const char* p_text, TTF_Font* fo
 	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
 
 	if (surfaceMessage == nullptr)
-	{ std::cout << SDL_GetTicks() << "\n";
+	{
 		return;
 	}
 
