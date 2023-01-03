@@ -580,7 +580,10 @@ void endscene()
 
 void menu()
 {
-	if (SDL_GetTicks() < 2000)
+	game_time.timing();
+	currentTick = game_time.get_milisecond();
+
+	if (currentTick < 2000)
 	{
 		if (!titlePlayed)
 		{
@@ -606,10 +609,6 @@ void menu()
 	}
 	else
 	{
-		lastTick = currentTick; game_time.timing();
-		currentTick = game_time.get_milisecond();
-		deltaTime = currentTick - lastTick;
-
 		int option = 0;
 		if (480 - 135 < mouse.getCenter().x && mouse.getCenter().x < 480 + 135
 			&& 48 * 6 < mouse.getCenter().y && mouse.getCenter().y < 48 * 6 + 72)

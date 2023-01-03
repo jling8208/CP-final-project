@@ -81,6 +81,11 @@ void RenderWindow::render(float p_x, float p_y, const char* p_text, TTF_Font* fo
 	SDL_Surface* surfaceMessage = TTF_RenderText_Blended(font, p_text, textColor);
 	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
 
+	if (surfaceMessage == nullptr)
+	{ std::cout << SDL_GetTicks() << "\n";
+		return;
+	}
+
 	SDL_Rect src;
 	src.x = 0;
 	src.y = 0;
