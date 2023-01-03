@@ -108,7 +108,7 @@ void Monster::update(double deltaTime, std::vector<Obstacle> rivers, std::vector
                 v = v * (1 / distance(v, Vector2f())) * velocity;
             }
         }
-        setVelocity(v.x, v.y); //v.print();
+        setVelocity(v.x, v.y); 
     }
 
     Vector2f currentPos = Vector2f(getPos());
@@ -129,7 +129,7 @@ void Monster::update(double deltaTime, std::vector<Obstacle> rivers, std::vector
             {
                 if (getPos().x > b.getPos().x && getPos().x + getCurrentFrame().w * getScale().x < b.getPos().x + b.getCurrentFrame().w)
                 {
-                    onRiver = false; //std::cout << "on bridge\n";
+                    onRiver = false; 
                     break;
                 }
             }
@@ -140,54 +140,6 @@ void Monster::update(double deltaTime, std::vector<Obstacle> rivers, std::vector
             setVelocity(getVelocity().x, 0);
         }
     }
-
-    /*if (getPos().y > 432 && getPos().y < 528) {
-        if (player.getPos().y >= getPos().y) {
-            setVelocity(0.0, velocity);
-        }
-        else {
-            setVelocity(0.0, -1 * velocity);
-        }
-    }
-    else if (getPos().y <= 432) {
-        if (player.getPos().y < 432) {
-            setVelocity(velocity * (player.getPos().x - getPos().x) / distance(player.getPos(), getPos()), velocity * (player.getPos().y - getPos().y) / distance(player.getPos(), getPos()));
-        }
-        else { Vector2f dst = Vector2f();
-            //bridge1
-            if (player.getPos().x <= 360) {dst = Vector2f(193, 432);
-                //setVelocity(velocity * (193 - getPos().x) / std::sqrt(std::pow((193 - getPos().x), 2) + std::pow((432 - getPos().y), 2)), velocity* ((432 - getPos().y) / std::sqrt(std::pow((193 - getPos().x), 2) + std::pow((432 - getPos().y), 2))));
-            }
-            //bridge2
-            else if (player.getPos().x > 360 && player.getPos().x < 600) {dst = Vector2f(433, 432);
-                //setVelocity(velocity * (433 - getPos().x) / std::sqrt(std::pow((433 - getPos().x), 2) + std::pow((432 - getPos().y), 2)), velocity* ((432 - getPos().y) / std::sqrt(std::pow((433 - getPos().x), 2) + std::pow((432 - getPos().y), 2))));
-            }
-            //bridge3
-            else {dst = Vector2f(673, 432);
-                //setVelocity(velocity * (673 - getPos().x) / std::sqrt(std::pow((673 - getPos().x), 2) + std::pow((432 - getPos().y), 2)), velocity* ((432 - getPos().y) / std::sqrt(std::pow((673 - getPos().x), 2) + std::pow((432 - getPos().y), 2))));
-            }setVelocity(velocity* (dst.x - getPos().x) / distance(dst, getPos()), velocity* (dst.y - getPos().y) / distance(dst, getPos()));
-        }
-    }
-    else if (getPos().y >= 528) {
-        if (player.getPos().y > 528) {
-            setVelocity(velocity * ((player.getPos().x - getPos().x) / std::sqrt(std::pow((player.getPos().x - getPos().x), 2) + std::pow((player.getPos().y - getPos().y), 2))), velocity * ((player.getPos().y - getPos().y) / std::sqrt(std::pow((player.getPos().x - getPos().x), 2) + std::pow((player.getPos().y - getPos().y), 2))));
-        }
-
-        else {
-            //bridge1
-            if (player.getPos().x <= 360) {
-                setVelocity(velocity * (193 - getPos().x) / std::sqrt(std::pow((193 - getPos().x), 2) + std::pow((528 - getPos().y), 2)), velocity* ((528 - getPos().y) / std::sqrt(std::pow((193 - getPos().x), 2) + std::pow((528 - getPos().y), 2))));
-            }
-            //bridge2
-            else if (player.getPos().x > 360 && player.getPos().x < 600) {
-                setVelocity(velocity * (433 - getPos().x) / std::sqrt(std::pow((433 - getPos().x), 2) + std::pow((528 - getPos().y), 2)), velocity* ((528 - getPos().y) / std::sqrt(std::pow((433 - getPos().x), 2) + std::pow((528 - getPos().y), 2))));
-            }
-            //bridge3
-            else {
-                setVelocity(velocity * (673 - getPos().x) / std::sqrt(std::pow((673 - getPos().x), 2) + std::pow((528 - getPos().y), 2)), velocity* ((528 - getPos().y) / std::sqrt(std::pow((673 - getPos().x), 2) + std::pow((528 - getPos().y), 2))));
-            }
-        }
-    }*/
     setPos(currentPos.x + getVelocity().x * deltaTime, currentPos.y + getVelocity().y * deltaTime);
     healthBar.at(0).setPos(getCenter().x - 32, getPos().y + getCurrentFrame().h * 1.2);
     healthBar.at(1).setPos(getCenter().x - 29, getPos().y + getCurrentFrame().h * 1.2 + 3);

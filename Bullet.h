@@ -34,8 +34,6 @@ private:
     Vector2f launchedVelocity;
     float velocity1D = 0.4;
     Vector2f initialMousePos;
-    int dirX = 1;
-    int dirY = 1;
     bool hit = false;
     int hit_times = 0;
 };

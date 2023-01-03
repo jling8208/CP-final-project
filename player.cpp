@@ -14,7 +14,6 @@
 Player::Player(Vector2f p_pos, SDL_Texture* p_tex_l, SDL_Texture* p_tex_r, SDL_Texture* p_healthMTexFG, SDL_Texture* p_healthMTexBG, SDL_Texture* p_healthMTexFrame)
     :Movable(p_pos, p_tex_r), tex_l (p_tex_l), tex_r(p_tex_r)
 {
-    //setScale(0.5, 0.5);
     healthBar.push_back(Entity(Vector2f(-64, -64), p_healthMTexBG));
     healthBar.push_back(Entity(Vector2f(-64, -64), p_healthMTexFG));
     healthBar.push_back(Entity(Vector2f(-64, -64), p_healthMTexFrame));

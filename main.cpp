@@ -773,7 +773,7 @@ void game()
 }
 
 int main(int argc, char* args[])
-{ 
+{
 	loadLevel(1);
 	while (gameRunning)
 	{

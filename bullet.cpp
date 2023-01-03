@@ -44,22 +44,22 @@ void Bullet::update(double deltaTime)
     if ((getPos() + deltaX).x + getCurrentFrame().w > 960)
     {
         setVelocity(-abs(getVelocity().x), getVelocity().y);
-        dirX = -1; addhit = true;
+        addhit = true;
     }
     else if ((getPos() + deltaX).x < 0)
     {
         setVelocity(abs(getVelocity().x), getVelocity().y);
-        dirX = 1; addhit = true;
+        addhit = true;
     }
     if ((getPos() + deltaY).y + getCurrentFrame().h > 720)
     {
         setVelocity(getVelocity().x, -abs(getVelocity().y));
-        dirY = -1; addhit = true;
+        addhit = true;
     }
     else if ((getPos() + deltaY).y < 0)
     {
         setVelocity(getVelocity().x, abs(getVelocity().y));
-        dirY = 1; addhit = true;
+        addhit = true;
     }
 
     if (addhit) { hit_times++; }
