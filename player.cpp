@@ -95,7 +95,7 @@ void Player::update(double deltaTime, bool move, std::vector<Obstacle> rivers, s
             break;
 
         case (LEFT):
-            tex = tex_l;
+            setTex(tex_l);
             if (getPos().x > 0)
             {
                 setVelocity(-v_init, 0);
@@ -107,7 +107,7 @@ void Player::update(double deltaTime, bool move, std::vector<Obstacle> rivers, s
             break;
 
         case (RIGHT):
-            tex = tex_r;
+            setTex(tex_r);
             if (getPos().x + getCurrentFrame().w * getScale().x < 960)
             {
                 setVelocity(v_init, 0);

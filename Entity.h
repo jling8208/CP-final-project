@@ -42,6 +42,5 @@ private:
 	float angle = 0;
 	Vector2f scale = Vector2f(1, 1);
 	SDL_Rect currentFrame;
-protected:
 	SDL_Texture* tex;
 };
